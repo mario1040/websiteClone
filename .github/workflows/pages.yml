@@ -23,6 +23,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate JavaScript and project metadata
+        run: |
+          node --check script.js
+          node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))"
+      - name: Validate internal navigation targets
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const ids = [...html.matchAll(/\\bid=["']([^"']+)["']/g)].map(match => match[1]);
+          const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index);
+          const missing = [...html.matchAll(/\\bhref=["']#([^"']+)["']/g)]
+            .map(match => match[1]).filter(id => !ids.includes(id));
+          if (duplicates.length || missing.length) {
+            console.error({ duplicates, missing });
+            process.exit(1);
+          }
+          console.log('Internal navigation targets validated.');
+          NODE
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload site
