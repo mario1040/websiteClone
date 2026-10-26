@@ -1,0 +1,10 @@
+{
+  "name": "mina-saad-website-recreation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Responsive static recreation study inspired by the publicly visible Mina Saad website.",
+  "scripts": {
+    "start": "npx serve .",
+    "check": "node --check script.js"
+  }
+}
